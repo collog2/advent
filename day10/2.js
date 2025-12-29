@@ -11,9 +11,8 @@ const rl = readline.createInterface({
 let password = 0
 for await (const line of rl) {
 	const parts = line.split(" ")
-	const joltagesParts = parts[parts.length - 1]
-	const joltages = joltagesParts
-		.slice(1, joltagesParts.length - 1)
+	const joltages = parts[parts.length - 1]
+		.slice(1, -1)
 		.split(",")
 		.map(a => +a)
 	const buttons = parts.splice(1, parts.length - 2).map(
