@@ -8,21 +8,6 @@ const rl = readline.createInterface({
 	crlfDelay: Infinity,
 })
 
-function isCorrect(selection, buttons, joltages) {
-	for (const bIndex in selection) {
-		const value = selection[bIndex]
-		const button = buttons[bIndex]
-		button.forEach(jIndex => {
-			joltages[jIndex] -= value
-		})
-	}
-	for (const j of joltages) {
-		if (j < 0) return -1
-		else if (j > 0) return 0
-	}
-	return 1
-}
-
 let password = 0
 for await (const line of rl) {
 	const parts = line.split(" ")
@@ -30,33 +15,47 @@ for await (const line of rl) {
 		.slice(1, -1)
 		.split(",")
 		.map(a => +a)
-	const buttons = parts.splice(1, parts.length - 2).map(
-		b =>
-			new Set(
-				b
-					.slice(1, -1)
-					.split(",")
-					.map(d => +d)
-			)
-	)
+	const buttons = parts
+		.splice(1, parts.length - 2)
+		.map(
+			b =>
+				new Set(
+					b
+						.slice(1, -1)
+						.split(",")
+						.map(d => +d)
+				)
+		)
+		.sort((a, b) => b.size - a.size)
+	function isCorrect(selection) {
+		for (const bIndex in selection) {
+			const value = selection[bIndex]
+			const button = buttons[bIndex]
+			for (const jIndex of button) {
+				if (value < joltages[jIndex]) return 0
+				else if (value > joltages[jIndex]) return -1
+			}
+		}
+		return 1
+	}
 	const bLength = buttons.length
 	let isFound = false
 	let presses = 0
 	let lastPresses = [new Array(bLength).fill(0)]
-	// const maxJoltage = joltages.sort((a, b) => b - a)[0]
+	const checked = new Set()
+	const maxJoltage = joltages.toSorted((a, b) => b - a)[0]
 	while (!isFound) {
 		presses++
 		console.log({ presses })
-		const checked = new Set()
 		const nowPresses = []
 		for (let btnIdx = 0; btnIdx < bLength; btnIdx++) {
 			for (let j = 0; j < lastPresses.length; j++) {
 				const selection = [...lastPresses[j]]
 				selection[btnIdx]++
-				const selecIdx = `${selection}`
-				// console.log(selecIdx)
+				if (selection[btnIdx] > maxJoltage) continue
+				const selecIdx = selection.join(",")
 				if (checked.has(selecIdx)) continue
-				const result = isCorrect(selection, buttons, [...joltages])
+				const result = isCorrect(selection)
 				if (result === 1) {
 					isFound = true
 					break
