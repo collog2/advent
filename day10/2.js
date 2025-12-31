@@ -1,8 +1,8 @@
 import fs from "node:fs"
 import readline from "node:readline"
 
-const fileStream = fs.createReadStream("input.txt")
-// const fileStream = fs.createReadStream("input-test.txt")
+// const fileStream = fs.createReadStream("input.txt")
+const fileStream = fs.createReadStream("input-test.txt")
 const rl = readline.createInterface({
 	input: fileStream,
 	crlfDelay: Infinity,
@@ -39,35 +39,33 @@ for await (const line of rl) {
 		return 1
 	}
 	const bLength = buttons.length
-	let isFound = false
-	let presses = 0
-	let lastPresses = [new Array(bLength).fill(0)]
-	const checked = new Set()
+	let presses = []
 	const maxJoltage = joltages.toSorted((a, b) => b - a)[0]
-	while (!isFound) {
-		presses++
-		console.log({ presses })
-		const nowPresses = []
-		for (let btnIdx = 0; btnIdx < bLength; btnIdx++) {
-			for (let j = 0; j < lastPresses.length; j++) {
-				const selection = [...lastPresses[j]]
-				selection[btnIdx]++
-				if (selection[btnIdx] > maxJoltage) continue
-				const selecIdx = selection.join(",")
-				if (checked.has(selecIdx)) continue
-				const result = isCorrect(selection)
-				if (result === 1) {
-					isFound = true
-					break
-				} else if (result === -1) continue
-				checked.add(selecIdx)
-				nowPresses.push(selection)
+	for (let btnIdx = 0; btnIdx < bLength; btnIdx++) {
+		let isFound = false
+		while (!isFound) {
+			const tempJoltages = [...joltages]
+			const button = buttons[btnIdx]
+			let p
+			let negative = false
+
+			for (p = 0; p < maxJoltage && !negative; p++) {
+				if (tempJoltages.some(j => j - p === 0) && tempJoltages.every(j => j >= 0)) {
+					for (const jIndex of button) {
+						if (tempJoltages[jIndex] < p) negative = true
+						else tempJoltages[jIndex] -= p
+					}
+				}
+			}
+			p--
+			console.log({ p, tempJoltages })
+
+			if (tempJoltages.every(j => j === 0)) {
+				isFound = true
+				presses.push(p)
 			}
 		}
-		lastPresses = [...nowPresses]
 	}
-	password += presses
-	console.log(presses)
+	password += presses.reduce((acc, p) => acc + p, 0)
 }
-
 console.log({ password })
