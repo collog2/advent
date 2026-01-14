@@ -60,15 +60,15 @@ function cells(shapesCount) {
 
 for (let i = 0; i < shapesCounts.length; i++) {
 	const sc = shapesCounts[i]
+	const area = dimentions[i][0] * dimentions[i][1]
+	if (area < cells(sc)) {
+		checked++
+		continue
+	}
 	const sum = sc.reduce((acc, count) => acc + count, 0)
 	const blockSpace = Math.floor(dimentions[i][0] / 3) * Math.floor(dimentions[i][1] / 3)
 	if (blockSpace >= sum) {
 		password++
-		checked++
-		continue
-	}
-	const area = dimentions[i][0] * dimentions[i][1]
-	if (area < cells(sc)) {
 		checked++
 		continue
 	}
