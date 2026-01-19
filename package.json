@@ -9,8 +9,5 @@
 	},
 	"author": "",
 	"license": "ISC",
-	"description": "",
-	"dependencies": {
-		"glpk.js": "^5.0.0"
-	}
+	"description": ""
 }

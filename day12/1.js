@@ -73,7 +73,16 @@ for (let i = 0; i < shapesCounts.length; i++) {
 		continue
 	}
 
-	unchecked++
+	function dfs(state) {
+		const { sc, matrix, index, shape } = state
+		// if(matrix[index[0]][index[1]])
+	}
+	const matrix = new Array(dimentions[i][0]).fill(new Array(dimentions[i][1]).fill(0))
+	const d = dfs({ sc, matrix, index: [0, 0], shape: shapes[0] })
+	if (d) {
+		password++
+		checked++
+	} else unchecked++
 }
 
 console.log({ checked, unchecked, length: shapesCounts.length })
